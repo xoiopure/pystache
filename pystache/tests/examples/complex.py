@@ -10,11 +10,11 @@ class Complex(object):
         return "Colors"
 
     def item(self):
-        items = []
-        items.append({ 'name': 'red', 'current': True, 'url': '#Red' })
-        items.append({ 'name': 'green', 'link': True, 'url': '#Green' })
-        items.append({ 'name': 'blue', 'link': True, 'url': '#Blue' })
-        return items
+        return [
+            {'name': 'red', 'current': True, 'url': '#Red'},
+            {'name': 'green', 'link': True, 'url': '#Green'},
+            {'name': 'blue', 'link': True, 'url': '#Blue'},
+        ]
 
     def list(self):
         return not self.empty()

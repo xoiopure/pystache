@@ -26,9 +26,7 @@ class DefaultsConfigurableTestCase(unittest.TestCase, AssertStringMixin):
             'SEARCH_DIRS', 'STRING_ENCODING',
             'TAG_ESCAPE', 'TEMPLATE_EXTENSION'
         ]
-        self.saved = {}
-        for e in defaults:
-            self.saved[e] = getattr(pystache.defaults, e)
+        self.saved = {e: getattr(pystache.defaults, e) for e in defaults}
 
     def tearDown(self):
         for key, value in self.saved.items():

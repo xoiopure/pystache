@@ -104,10 +104,7 @@ class Loader(object):
             Defaults to None.
 
         """
-        if isinstance(s, unicode):
-            return unicode(s)
-
-        return self.to_unicode(s, encoding)
+        return unicode(s) if isinstance(s, unicode) else self.to_unicode(s, encoding)
 
     def read(self, path, encoding=None):
         """

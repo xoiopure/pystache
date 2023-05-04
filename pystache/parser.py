@@ -36,7 +36,7 @@ def parse(template, delimiters=None):
 
     """
     if type(template) is not unicode:
-        raise Exception("Template is not unicode: %s" % type(template))
+        raise Exception(f"Template is not unicode: {type(template)}")
     parser = _Parser(delimiters)
     return parser.parse(template)
 
@@ -81,11 +81,10 @@ def _format(obj, exclude=None):
         exclude = []
     exclude.append('key')
     attrs = obj.__dict__
-    names = list(set(attrs.keys()) - set(exclude))
-    names.sort()
+    names = sorted(set(attrs.keys()) - set(exclude))
     names.insert(0, 'key')
-    args = ["%s=%s" % (name, repr(attrs[name])) for name in names]
-    return "%s(%s)" % (obj.__class__.__name__, ", ".join(args))
+    args = [f"{name}={repr(attrs[name])}" for name in names]
+    return f'{obj.__class__.__name__}({", ".join(args)})'
 
 
 class _CommentNode(object):
@@ -162,12 +161,7 @@ class _InvertedNode(object):
         return _format(self)
 
     def render(self, engine, context):
-        # TODO: is there a bug because we are not using the same
-        #   logic as in fetch_string()?
-        data = engine.resolve_context(context, self.key)
-        # Note that lambdas are considered truthy for inverted sections
-        # per the spec.
-        if data:
+        if data := engine.resolve_context(context, self.key):
             return u''
         return self.parsed_section.render(engine, context)
 
@@ -317,7 +311,7 @@ class _Parser(object):
 
             if tag_type == '/':
                 if tag_key != section_key:
-                    raise ParsingError("Section end tag mismatch: %s != %s" % (tag_key, section_key))
+                    raise ParsingError(f"Section end tag mismatch: {tag_key} != {section_key}")
 
                 # Restore previous state with newly found section data.
                 parsed_section = parsed_template
@@ -360,7 +354,7 @@ class _Parser(object):
         if tag_type == '>':
             return _PartialNode(tag_key, leading_whitespace)
 
-        raise Exception("Invalid symbol for interpolation tag: %s" % repr(tag_type))
+        raise Exception(f"Invalid symbol for interpolation tag: {repr(tag_type)}")
 
     def _make_section_node(self, template, tag_type, tag_key, parsed_section,
                            section_start_index, section_end_index):
@@ -375,4 +369,4 @@ class _Parser(object):
         if tag_type == '^':
             return _InvertedNode(tag_key, parsed_section)
 
-        raise Exception("Invalid symbol for section tag: %s" % repr(tag_type))
+        raise Exception(f"Invalid symbol for section tag: {repr(tag_type)}")

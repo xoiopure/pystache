@@ -71,7 +71,7 @@ def _convert_2to3(path):
     """
     base, ext = os.path.splitext(path)
     # For example, "README.temp2to3.rst".
-    new_path = "%s.temp2to3%s" % (base, ext)
+    new_path = f"{base}.temp2to3{ext}"
 
     copyfile(path, new_path)
 
