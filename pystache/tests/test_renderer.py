@@ -26,8 +26,7 @@ def _make_renderer():
     Return a default Renderer instance for testing purposes.
 
     """
-    renderer = Renderer(string_encoding='ascii', file_encoding='ascii')
-    return renderer
+    return Renderer(string_encoding='ascii', file_encoding='ascii')
 
 
 def mock_unicode(b, encoding=None):
@@ -66,14 +65,11 @@ class RendererInitTestCase(unittest.TestCase):
         self.assertEqual(escape(">"), "&gt;")
         self.assertEqual(escape('"'), "&quot;")
         # Single quotes are escaped only in Python 3.2 and later.
-        if sys.version_info < (3, 2):
-            expected = "'"
-        else:
-            expected = '&#x27;'
+        expected = "'" if sys.version_info < (3, 2) else '&#x27;'
         self.assertEqual(escape("'"), expected)
 
     def test_escape(self):
-        escape = lambda s: "**" + s
+        escape = lambda s: f"**{s}"
         renderer = Renderer(escape=escape)
         self.assertEqual(renderer.escape("bar"), "**bar")
 
@@ -432,10 +428,7 @@ class RendererTests(unittest.TestCase, AssertStringMixin):
         """
         renderer = self._renderer()
         def to_str(val):
-            if not val:
-                return ''
-            else:
-                return str(val)
+            return str(val) if val else ''
 
         self.assertEqual(renderer.render('{{value}}', value=None), 'None')
         renderer.str_coerce = to_str
@@ -446,12 +439,13 @@ class RendererTests(unittest.TestCase, AssertStringMixin):
         Test that string coercion can be customized via subclassing.
 
         """
+
+
         class MyRenderer(Renderer):
             def str_coerce(self, val):
-                if not val:
-                    return ''
-                else:
-                    return str(val)
+                return str(val) if val else ''
+
+
         renderer1 = Renderer()
         renderer2 = MyRenderer()
 
@@ -555,8 +549,12 @@ class Renderer_MakeRenderEngineTests(unittest.TestCase, AssertStringMixin, Asser
 
        # Include dict directly since str(dict) is different in Python 2 and 3:
        #   <type 'dict'> versus <class 'dict'>, respectively.
-        self.assertException(TemplateNotFoundError, "Name 'foo' not found in partials: %s" % dict,
-                             resolve_partial, "foo")
+        self.assertException(
+            TemplateNotFoundError,
+            f"Name 'foo' not found in partials: {dict}",
+            resolve_partial,
+            "foo",
+        )
 
     ## Test the engine's literal attribute.
 
@@ -617,7 +615,7 @@ class Renderer_MakeRenderEngineTests(unittest.TestCase, AssertStringMixin, Asser
 
         """
         renderer = Renderer()
-        renderer.escape = lambda s: "**" + s
+        renderer.escape = lambda s: f"**{s}"
 
         engine = renderer._make_render_engine()
         escape = engine.escape

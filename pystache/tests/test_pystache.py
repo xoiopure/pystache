@@ -69,9 +69,10 @@ class PystacheTests(unittest.TestCase):
 
     def test_non_strings(self):
         template = "{{#stats}}({{key}} & {{value}}){{/stats}}"
-        stats = []
-        stats.append({'key': 123, 'value': ['something']})
-        stats.append({'key': u"chris", 'value': 0.900})
+        stats = [
+            {'key': 123, 'value': ['something']},
+            {'key': u"chris", 'value': 0.900},
+        ]
         context = { 'stats': stats }
         self._assert_rendered(self.non_strings_expected, template, context)
 

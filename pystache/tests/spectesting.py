@@ -7,6 +7,7 @@ Creates a unittest.TestCase for the tests defined in the mustache spec.
 
 """
 
+
 # TODO: this module can be cleaned up somewhat.
 # TODO: move all of this code to pystache/tests/spectesting.py and
 #   have it expose a get_spec_tests(spec_test_dir) function.
@@ -36,7 +37,7 @@ except ImportError:
             #   http://bugs.python.org/issue7559
             from sys import exc_info
             ex_type, ex_value, tb = exc_info()
-            new_ex = Exception("%s: %s" % (ex_type.__name__, ex_value))
+            new_ex = Exception(f"{ex_type.__name__}: {ex_value}")
             raise new_ex.__class__, new_ex, tb
     file_extension = 'json'
     parser = json
@@ -94,7 +95,7 @@ def get_spec_tests(spec_test_dir):
 
 
 def _get_parser_info():
-    return "%s (version %s)" % (parser.__name__, parser.__version__)
+    return f"{parser.__name__} (version {parser.__version__})"
 
 
 def _read_spec_tests(path):
@@ -166,9 +167,15 @@ def _deserialize_spec_test(data, file_path):
 
     _convert_children(context)
 
-    test_case = _make_spec_test(expected, template, context, partials, description, test_name, file_path)
-
-    return test_case
+    return _make_spec_test(
+        expected,
+        template,
+        context,
+        partials,
+        description,
+        test_name,
+        file_path,
+    )
 
 
 def _make_spec_test(expected, template, context, partials, description, test_name, file_path):
@@ -177,10 +184,8 @@ def _make_spec_test(expected, template, context, partials, description, test_nam
 
     """
     file_name  = os.path.basename(file_path)
-    test_method_name = "Mustache spec (%s): %s" % (file_name, repr(test_name))
+    test_method_name = f"Mustache spec ({file_name}): {repr(test_name)}"
 
-    # We subclass SpecTestBase in order to control the test method name (for
-    # the purposes of improved reporting).
     class SpecTest(SpecTestBase):
         pass
 
@@ -266,7 +271,7 @@ class SpecTestBase(unittest.TestCase, AssertStringMixin):
         parser_info = _get_parser_info()
         subs = [repr(test_name), description, os.path.abspath(file_path),
                 template, repr(context), parser_info]
-        subs = tuple([escape(sub) for sub in subs])
+        subs = tuple(escape(sub) for sub in subs)
         # We include the parsing module version info to help with troubleshooting
         # yaml/json/simplejson issues.
         message = """%s: %s

@@ -17,9 +17,7 @@ from pystache.tests.common import AssertStringMixin, AssertExceptionMixin, Attac
 
 
 def _get_unicode_char():
-    if sys.version_info < (3, ):
-        return 'u'
-    return ''
+    return 'u' if sys.version_info < (3, ) else ''
 
 _UNICODE_CHAR = _get_unicode_char()
 
@@ -33,12 +31,7 @@ def mock_literal(s):
       s: a byte string or unicode string.
 
     """
-    if isinstance(s, unicode):
-        # Strip off unicode super classes, if present.
-        u = unicode(s)
-    else:
-        u = unicode(s, encoding='ascii')
-
+    u = unicode(s) if isinstance(s, unicode) else unicode(s, encoding='ascii')
     # We apply upper() to make sure we are actually using our custom
     # function in the tests
     return u.upper()
@@ -81,9 +74,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
 
         """
         renderer = Renderer(string_encoding='utf-8', missing_tags='strict')
-        engine = renderer._make_render_engine()
-
-        return engine
+        return renderer._make_render_engine()
 
     def _assert_render(self, expected, template, *context, **kwargs):
         """
@@ -141,7 +132,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
 
         """
         engine = self._engine()
-        engine.escape = lambda s: "**" + s
+        engine.escape = lambda s: f"**{s}"
 
         self._assert_render(u'**bar', '{{foo}}', {'foo': 'bar'}, engine=engine)
 
@@ -152,7 +143,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
         """
         engine = self._engine()
         engine.literal = lambda s: s.upper()  # a test version
-        engine.escape = lambda s: "**" + s
+        engine.escape = lambda s: f"**{s}"
 
         template = 'literal: {{{foo}}} escaped: {{foo}}'
         context = {'foo': 'bar'}
@@ -171,10 +162,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
             pass
 
         def escape(s):
-            if type(s) is MyUnicode:
-                return "**" + s
-            else:
-                return s + "**"
+            return f"**{s}" if type(s) is MyUnicode else f"{s}**"
 
         engine = self._engine()
         engine.escape = escape
@@ -186,10 +174,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
 
     # Custom to_str for testing purposes.
     def _to_str(self, val):
-        if not val:
-            return ''
-        else:
-            return str(val)
+        return str(val) if val else ''
 
     def test_to_str(self):
         """Test the to_str attribute."""
@@ -545,7 +530,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
 
     def test_section__lambda(self):
         template = '{{#test}}Mom{{/test}}'
-        context = {'test': (lambda text: 'Hi %s' % text)}
+        context = {'test': lambda text: f'Hi {text}'}
         self._assert_render(u'Hi Mom', template, context)
 
     # This test is also important for testing 2to3.
@@ -574,7 +559,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
         """
         template = '{{#iterable}}{{.}}{{/iterable}}'
 
-        context = {'iterable': (i for i in range(3))}  # type 'generator'
+        context = {'iterable': iter(range(3))}
         self._assert_render(u'012', template, context)
 
         context = {'iterable': xrange(4)}  # type 'xrange'
@@ -604,7 +589,7 @@ class RenderTests(unittest.TestCase, AssertStringMixin, AssertExceptionMixin):
 
         """
         template = '{{#test}}Hi {{person}}{{/test}}'
-        context = {'person': 'Mom', 'test': (lambda text: text + " :)")}
+        context = {'person': 'Mom', 'test': lambda text: f"{text} :)"}
         self._assert_render(u'Hi Mom :)', template, context)
 
     def test_section__lambda__list(self):

@@ -69,10 +69,7 @@ def _get_value(context, key):
         else:
             # TODO: consider using EAFP here instead.
             #   http://docs.python.org/glossary.html#term-eafp
-            if callable(attr):
-                return attr()
-            return attr
-
+            return attr() if callable(attr) else attr
     return _NOT_FOUND
 
 
@@ -88,7 +85,7 @@ class KeyNotFoundError(PystacheError):
         self.details = details
 
     def __str__(self):
-        return "Key %s not found: %s" % (repr(self.key), self.details)
+        return f"Key {repr(self.key)} not found: {self.details}"
 
 
 class ContextStack(object):
@@ -140,7 +137,7 @@ class ContextStack(object):
         "ContextStack({'alpha': 'abc'}, {'numeric': 123})"
 
         """
-        return "%s%s" % (self.__class__.__name__, tuple(self._stack))
+        return f"{self.__class__.__name__}{tuple(self._stack)}"
 
     @staticmethod
     def create(*context, **kwargs):
@@ -297,7 +294,7 @@ class ContextStack(object):
             # TODO: consider using EAFP here instead.
             #   http://docs.python.org/glossary.html#term-eafp
             if result is _NOT_FOUND:
-                raise KeyNotFoundError(name, "missing %s" % repr(part))
+                raise KeyNotFoundError(name, f"missing {repr(part)}")
 
         return result
 

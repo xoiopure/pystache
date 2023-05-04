@@ -73,7 +73,7 @@ class Locator(object):
         template_name = obj.__class__.__name__
 
         def repl(match):
-            return '_' + match.group(0).lower()
+            return f'_{match.group(0).lower()}'
 
         return re.sub('[A-Z]', repl, template_name)[1:]
 
@@ -118,8 +118,9 @@ class Locator(object):
         path = self._find_path(search_dirs, file_name)
 
         if path is None:
-            raise TemplateNotFoundError('File %s not found in dirs: %s' %
-                                        (repr(file_name), repr(search_dirs)))
+            raise TemplateNotFoundError(
+                f'File {repr(file_name)} not found in dirs: {repr(search_dirs)}'
+            )
 
         return path
 
@@ -166,6 +167,4 @@ class Locator(object):
         if dir_path is not None:
             search_dirs = [dir_path] + search_dirs
 
-        path = self._find_path_required(search_dirs, file_name)
-
-        return path
+        return self._find_path_required(search_dirs, file_name)

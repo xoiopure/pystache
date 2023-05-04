@@ -177,9 +177,7 @@ class Renderer(object):
         """
         # We type-check to avoid "TypeError: decoding Unicode is not supported".
         # We avoid the Python ternary operator for Python 2.4 support.
-        if isinstance(s, unicode):
-            return s
-        return self.unicode(s)
+        return s if isinstance(s, unicode) else self.unicode(s)
 
     def _to_unicode_hard(self, s):
         """
@@ -262,8 +260,9 @@ class Renderer(object):
             #   raise a KeyError on name not found.
             template = partials.get(name)
             if template is None:
-                raise TemplateNotFoundError("Name %s not found in partials: %s" %
-                                            (repr(name), type(partials)))
+                raise TemplateNotFoundError(
+                    f"Name {repr(name)} not found in partials: {type(partials)}"
+                )
 
             # RenderEngine requires that the return value be unicode.
             return self._to_unicode_hard(template)
@@ -282,7 +281,7 @@ class Renderer(object):
         elif val == MissingTags.ignore:
             return False
 
-        raise Exception("Unsupported 'missing_tags' value: %s" % repr(val))
+        raise Exception(f"Unsupported 'missing_tags' value: {repr(val)}")
 
     def _make_resolve_partial(self):
         """
@@ -328,12 +327,13 @@ class Renderer(object):
         resolve_context = self._make_resolve_context()
         resolve_partial = self._make_resolve_partial()
 
-        engine = RenderEngine(literal=self._to_unicode_hard,
-                              escape=self._escape_to_unicode,
-                              resolve_context=resolve_context,
-                              resolve_partial=resolve_partial,
-                              to_str=self.str_coerce)
-        return engine
+        return RenderEngine(
+            literal=self._to_unicode_hard,
+            escape=self._escape_to_unicode,
+            resolve_context=resolve_context,
+            resolve_partial=resolve_partial,
+            to_str=self.str_coerce,
+        )
 
     # TODO: add unit tests for this method.
     def load_template(self, template_name):

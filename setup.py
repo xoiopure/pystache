@@ -170,7 +170,7 @@ def write(u, path):
     Write a unicode string to a file (as utf-8).
 
     """
-    print("writing to: %s" % path)
+    print(f"writing to: {path}")
     # This function implementation was chosen to be compatible across Python 2/3.
     f = open(path, "wb")
     try:
@@ -191,8 +191,7 @@ def make_temp_path(path, new_ext=None):
     root, ext = os.path.splitext(path)
     if new_ext is None:
         new_ext = ext
-    temp_path = root + TEMP_EXTENSION + new_ext
-    return temp_path
+    return root + TEMP_EXTENSION + new_ext
 
 
 def strip_html_comments(text):
@@ -221,7 +220,7 @@ def convert_md_to_rst(md_path, rst_temp_path):
 
     """
     # Pandoc uses the UTF-8 character encoding for both input and output.
-    command = "pandoc --write=rst --output=%s %s" % (rst_temp_path, md_path)
+    command = f"pandoc --write=rst --output={rst_temp_path} {md_path}"
     print("converting with pandoc: %s to %s\n-->%s" % (md_path, rst_temp_path,
                                                        command))
 
@@ -298,7 +297,7 @@ Run the following command and commit the changes--
 """ % (RST_DESCRIPTION_PATH, PREP_COMMAND))
         sys.exit()
 
-    print("Description up-to-date: %s" % RST_DESCRIPTION_PATH)
+    print(f"Description up-to-date: {RST_DESCRIPTION_PATH}")
 
     answer = raw_input("Are you sure you want to publish to PyPI (yes/no)?")
 

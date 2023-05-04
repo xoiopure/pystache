@@ -108,10 +108,7 @@ class RenderEngine(object):
             # Return because _render_value() is already a string.
             return self._render_value(val(), context)
 
-        if not is_string(val):
-            return self.to_str(val)
-
-        return val
+        return val if is_string(val) else self.to_str(val)
 
     def fetch_section_data(self, context, name):
         """

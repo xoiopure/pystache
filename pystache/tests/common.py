@@ -159,7 +159,7 @@ class AssertStringMixin:
 
         self.assertEqual(actual, expected, make_message("different characters"))
 
-        reason = "types different: %s != %s (actual)" % (repr(type(expected)), repr(type(actual)))
+        reason = f"types different: {repr(type(expected))} != {repr(type(actual))} (actual)"
         self.assertEqual(type(expected), type(actual), make_message(reason))
 
 
@@ -170,7 +170,7 @@ class AssertIsMixin:
     # unittest.assertIs() is not available until Python 2.7:
     #   http://docs.python.org/library/unittest.html#unittest.TestCase.assertIsNone
     def assertIs(self, first, second):
-        self.assertTrue(first is second, msg="%s is not %s" % (repr(first), repr(second)))
+        self.assertTrue(first is second, msg=f"{repr(first)} is not {repr(second)}")
 
 
 class AssertExceptionMixin:
@@ -232,6 +232,7 @@ class Attachable(object):
             setattr(self, arg, value)
 
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__,
-                           ", ".join("%s=%s" % (k, repr(v))
-                                     for k, v in self.__args__.iteritems()))
+        return "%s(%s)" % (
+            self.__class__.__name__,
+            ", ".join(f"{k}={repr(v)}" for k, v in self.__args__.iteritems()),
+        )
